@@ -30,3 +30,7 @@ Favoji cannot run on Firefox-protected pages such as `about:*`,
 
 Emoji favicons are rendered as transparent SVG text, so they inherit the browser
 tab background behind them.
+
+## License
+
+Favoji is available under the [MIT License](LICENSE).
