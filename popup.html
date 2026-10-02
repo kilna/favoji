@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Favoji</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Favoji</h1>
+        <p>Pick an emoji to replace this tab's favicon.</p>
+      </header>
+
+      <label class="search-field">
+        <span class="visually-hidden">Search emojis</span>
+        <input id="search-input" type="search" placeholder="Search emojis..." autocomplete="off">
+      </label>
+
+      <div id="emoji-picker" class="emoji-picker">
+        <div id="search-results" class="emoji-grid" hidden aria-label="Search results"></div>
+        <div id="category-list" class="category-list" aria-label="Emoji categories"></div>
+      </div>
+
+      <footer class="footer">
+        <button id="clear-tab" class="secondary" type="button">Restore Original Favicon</button>
+        <p id="status" role="status" aria-live="polite"></p>
+      </footer>
+    </main>
+
+    <script src="emoji-data.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>
