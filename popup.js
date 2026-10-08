@@ -1,3 +1,4 @@
+/* global EMOJI_CATEGORIES, EMOJI_KEYWORDS */
 "use strict";
 
 const elements = {};
@@ -35,12 +36,14 @@ function buildCategoryList() {
 }
 
 function bindEvents() {
-  elements.searchInput.addEventListener("input", renderPicker);
+  elements.searchInput.addEventListener("input", (event) => {
+    renderPicker(event.currentTarget.value);
+  });
   elements.clearTab.addEventListener("click", clearTabOverride);
 }
 
-function renderPicker() {
-  const query = elements.searchInput.value.trim().toLowerCase();
+function renderPicker(rawValue) {
+  const query = String(rawValue ?? elements.searchInput.value).trim().toLowerCase();
 
   if (query) {
     elements.categoryList.hidden = true;
@@ -76,24 +79,93 @@ function renderEmojiGrid(container, emojis) {
 }
 
 function searchEmojis(query) {
-  const results = [];
+  const terms = query.replace(/[_-]+/g, " ").split(/\s+/).filter(Boolean);
+  const matches = [];
+  const seen = new Set();
 
   EMOJI_CATEGORIES.forEach((category) => {
-    const haystack = `${category.label} ${category.keywords}`.toLowerCase();
-
-    if (haystack.includes(query)) {
-      results.push(...category.emojis);
-      return;
-    }
+    const label = category.label.toLowerCase();
+    const labelMatch = terms.length === 1 && categoryLabelMatches(label, terms[0]);
 
     category.emojis.forEach((emoji) => {
-      if (emoji.includes(query)) {
-        results.push(emoji);
+      if (seen.has(emoji)) {
+        return;
       }
+
+      const keywords = emojiKeywords(emoji);
+      const keywordMatch = terms.every((term) => keywordIncludes(keywords, emoji, term));
+
+      if (!keywordMatch && !labelMatch) {
+        return;
+      }
+
+      seen.add(emoji);
+      matches.push({
+        emoji,
+        rank: keywordMatch ? keywordRank(keywords, terms) : 3
+      });
     });
   });
 
-  return [...new Set(results)];
+  matches.sort((left, right) => left.rank - right.rank);
+  return matches.map((match) => match.emoji);
+}
+
+function emojiKeywords(emoji) {
+  if (typeof EMOJI_KEYWORDS === "undefined") {
+    return "";
+  }
+
+  return (EMOJI_KEYWORDS[emoji] || "").replace(/[_-]+/g, " ");
+}
+
+function categoryLabelMatches(label, term) {
+  return label.startsWith(term) && label.length - term.length <= 1;
+}
+
+function keywordIncludes(keywords, emoji, term) {
+  if (emoji.includes(term)) {
+    return true;
+  }
+
+  return keywords.split(/\s+/).some((word) => wordMatches(word, term));
+}
+
+function keywordRank(keywords, terms) {
+  const words = keywords.split(/\s+/).filter(Boolean);
+
+  if (terms.every((term) => words.includes(term))) {
+    return 0;
+  }
+
+  if (terms.every((term) => words.some((word) => word.startsWith(term)))) {
+    return 1;
+  }
+
+  return 2;
+}
+
+function wordMatches(word, term) {
+  if (word.startsWith(term)) {
+    return true;
+  }
+
+  // "smile" matches "smiling" — the trailing e is dropped.
+  if (term.length >= 4 && term.endsWith("e")) {
+    const stem = term.slice(0, -1);
+
+    if (word.startsWith(stem) && /^(ing|ed|er|y)/.test(word.slice(stem.length))) {
+      return true;
+    }
+  }
+
+  // "grin" matches "grinning".
+  if (term.length >= 3) {
+    const doubled = term + term[term.length - 1];
+    return word.startsWith(doubled) && /^(ing|ed)/.test(word.slice(doubled.length));
+  }
+
+  return false;
 }
 
 async function applyEmoji(emoji) {

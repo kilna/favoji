@@ -1,7 +1,7 @@
 # Favoji
 
 Favoji is a Firefox WebExtension that lets you override a tab favicon with an
-emoji for the tab's lifetime.
+emoji. The override stays with that tab, including after Firefox restarts.
 
 ## Development Install
 
@@ -17,11 +17,14 @@ from the same page after editing extension files.
 
 Open the Favoji toolbar popup on a page:
 
-1. Browse emoji categories or search by keyword.
+1. Browse emoji categories or search by name, such as "pizza", "dog", or "coffee".
 2. Click an emoji to apply it to the current tab.
 3. Click `Restore Original Favicon` to undo the override.
 
-Overrides last until the tab is closed or you restore the original favicon.
+Overrides stay on that tab until you restore the original favicon or close the
+tab. Firefox keeps them across a restart when it restores the session. That
+uses Firefox tab session data, which the install prompt labels "Access
+recently closed tabs."
 
 ## Limitations
 

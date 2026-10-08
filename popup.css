@@ -3,6 +3,10 @@
   font: 14px/1.4 system-ui, sans-serif;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 body {
   margin: 0;
   width: 360px;

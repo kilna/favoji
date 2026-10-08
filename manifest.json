@@ -1,11 +1,12 @@
 {
   "manifest_version": 2,
   "name": "Favoji",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Set an emoji as the favicon for the current Firefox tab. No account or registration required. Favoji runs locally and does not collect or transmit data.",
   "permissions": [
     "<all_urls>",
     "activeTab",
+    "sessions",
     "tabs"
   ],
   "background": {
